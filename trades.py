@@ -3,7 +3,7 @@ import json
 import base64
 import hmac
 import hashlib
-import datetime, time
+import time
 
 #import gemini api key and secret
 from secrets import API_KEY, API_SECRET

@@ -2,7 +2,7 @@ from __future__ import print_function
 from datetime import datetime
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
-from secrets import SPREADSHEET_ID, BTC_SHEET_NAME, ETH_SHEET_NAME
+from secrets import SPREADSHEET_ID
 
 '''
 handles authentication and returns sheet object from which we can read and write
@@ -17,7 +17,6 @@ def get_sheet():
 
   service = build('sheets', 'v4', credentials=creds)
 
-  range_test = "{}!A1:E1".format(BTC_SHEET_NAME)
 
   # Call the Sheets API and return sheet object
   sheet = service.spreadsheets()
