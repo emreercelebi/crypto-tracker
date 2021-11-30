@@ -1,10 +1,6 @@
 from __future__ import print_function
 from datetime import datetime
-import os.path
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from google.oauth2 import service_account
 from secrets import SPREADSHEET_ID, BTC_SHEET_NAME, ETH_SHEET_NAME
 
@@ -27,6 +23,10 @@ def get_sheet():
   sheet = service.spreadsheets()
   return sheet
 
+'''
+gets the last-entered timestamp in the spreadsheet. This timestamp is used 
+in the Gemini api call to serve as a starting point for querying trades
+'''
 def get_last_timestamp(sheet, sheet_name, last_index):
   range_query = "{}!A{}".format(sheet_name, last_index)
   result = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=range_query).execute()
@@ -36,6 +36,9 @@ def get_last_timestamp(sheet, sheet_name, last_index):
   else:
     return 0
 
+'''
+writes newly fetched trade data to sheet
+'''
 def write_to_sheet(sheet, sheet_name, last_index, trades):
   trade_count = len(trades)
   range_row_start = last_index + 1

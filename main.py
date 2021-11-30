@@ -28,12 +28,15 @@ for config in configs:
   #get last timestamp to use as starting point in gemini api call
   last_index = last_indices[config["index_key"]]
   last_timestamp = sheets.get_last_timestamp(sheet, config["sheet_name"], last_index)
+  if last_timestamp == 0:
+    print("Error getting last timestamp for {}", config["index_key"])
+    continue
 
   my_trades = get_trades(config["symbol"], last_timestamp)
   if len(my_trades) <= 1:
     print("No {} transactions have occurred since the provided timestamp {}".format(config["symbol"], last_timestamp))
     continue
-  #trades come back from newest to oldest. we want the opposite.
+  #trades come back from newest to oldest. I want the opposite.
   my_trades.reverse()
   #since gemini api returns all transaction on or after provided timestamp, we remove the first so we only have transactions that occurred after the provided timestamp
   my_trades = my_trades[1:]
