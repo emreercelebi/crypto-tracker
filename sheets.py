@@ -1,4 +1,5 @@
 from __future__ import print_function
+from datetime import datetime
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -35,9 +36,34 @@ def get_last_timestamp(sheet, sheet_name, last_index):
   else:
     return 0
 
-# result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-#                             range=range_test).execute()
-# values = result.get('values', [])
+def write_to_sheet(sheet, sheet_name, last_index, trades):
+  trade_count = len(trades)
+  range_row_start = last_index + 1
+  range_row_end = last_index + trade_count
 
-# print(result)
+  range_query = "{}!A{}:E{}".format(sheet_name, range_row_start, range_row_end)
+
+  values = []
+  for trade in trades:
+    d = datetime.fromtimestamp(trade["timestampms"] / 1000)
+    timestamp = trade["timestampms"]
+    date_string = d.strftime("%m/%d/%Y")
+    cost = float(trade["price"]) * float(trade["amount"]) + float(trade["fee_amount"])
+    amount = float(trade["amount"])
+    cost_per_coin = cost / amount
+
+    print("date string: {}".format(date_string))
+
+    row = [timestamp, date_string, cost, amount, cost_per_coin]
+    values.append(row)
+
+  body = {
+    "values": values
+  }
+
+  result = sheet.values().update(
+    spreadsheetId=SPREADSHEET_ID, range=range_query,
+    valueInputOption="USER_ENTERED", body=body).execute()
+  print('{0} cells updated.'.format(result.get('updatedCells')))
+
 

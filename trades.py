@@ -11,16 +11,16 @@ from secrets import API_KEY, API_SECRET
 '''
 Make request to gemini to get trades. Ref: https://docs.gemini.com/rest-api/#private-api-invocation 
 '''
-def get_trades(symbol):
+def get_trades(symbol, timestamp):
   url = "https://api.gemini.com/v1/mytrades"
   gemini_api_key = API_KEY
   gemini_api_secret = API_SECRET.encode()
 
-  t = datetime.datetime.now()
-  payload_nonce =  str(int(time.mktime(t.timetuple())*1000))
+  payload_nonce =  str(round(time.time() * 1000))
   payload =  {
     "request": "/v1/mytrades",
     "nonce": payload_nonce,
+    "timestamp": timestamp,
     "symbol": symbol
   }
   encoded_payload = json.dumps(payload).encode()

@@ -20,11 +20,27 @@ configs = [
 sheet = sheets.get_sheet()
 
 for config in configs:
+  #get last indices data from local json file
   f = open("last-indices.json")
   last_indices = json.load(f)
+  f.close()
+
+  #get last timestamp to use as starting point in gemini api call
   last_index = last_indices[config["index_key"]]
   last_timestamp = sheets.get_last_timestamp(sheet, config["sheet_name"], last_index)
   print(last_timestamp)
+
+  my_trades = get_trades(config["symbol"], last_timestamp)
+  if len(my_trades) <= 1:
+    print("No {} transactions have occurred since the provided timestamp {}".format(config["symbol"], last_timestamp))
+    continue
+  #trades come back from newest to oldest. we want the opposite.
+  my_trades.reverse()
+  #since gemini api returns all transaction on or after provided timestamp, we remove the first so we only have transactions that occurred after the provided timestamp
+  my_trades = my_trades[1:]
+  print(my_trades)
+
+  sheets.write_to_sheet(sheet, config["sheet_name"], last_index, my_trades)
 
 # f = open("last-indices.json")
 # last_indices = json.load(f)
@@ -35,5 +51,4 @@ for config in configs:
 # json.dump(last_indices, f)
 
 
-my_trades = get_trades("btcusd")
-print(my_trades[0])
+
