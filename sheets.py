@@ -54,8 +54,6 @@ def write_to_sheet(sheet, sheet_name, last_index, trades):
     amount = float(trade["amount"])
     cost_per_coin = cost / amount
 
-    print("date string: {}".format(date_string))
-
     row = [timestamp, date_string, cost, amount, cost_per_coin]
     values.append(row)
 
